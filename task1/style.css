@@ -157,3 +157,9 @@ footer {
     border-radius: 10px;
     margin-top: 20px;
 }
+
+.contact-links a:hover {
+    background-color: #ff6b6b;
+    color: white;
+    text-decoration: underline;
+}
