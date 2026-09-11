@@ -139,8 +139,11 @@ section h2 {
     border-radius: 5px;
     font-weight: bold;
     transition: all 0.3s;
-    width: 200px;
+    width: auto;
+    min-width: 300px;
+    max-width: 100%;
     text-align: center;
+    word-break: break-word;
 }
 
 .contact-links a:hover {
