@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Быки и коровы</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Быки и коровы</h1>
+    </header>
+
+    <main>
+        <section class="game">
+            <p>Введите 4-значное число (цифры не должны повторяться):</p>
+            <input type="text" id="guess-input" maxlength="4" placeholder="1234">
+            <button id="check-btn">Проверить</button>
+            <button id="new-game-btn">Новая игра</button>
+            <p id="message"></p>
+            <p>Попыток: <span id="attempts">0</span></p>
+        </section>
+
+        <section class="history">
+            <h2>История попыток</h2>
+            <ul id="history-list"></ul>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
