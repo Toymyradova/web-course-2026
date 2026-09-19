@@ -19,7 +19,6 @@ header h1 {
     margin-bottom: 20px;
 }
 
-/* Блок игры */
 .game {
     background-color: white;
     padding: 20px;
@@ -59,7 +58,6 @@ header h1 {
     color: #e74c3c;
 }
 
-/* Блок истории */
 .history {
     background-color: white;
     padding: 20px;
