@@ -57,6 +57,7 @@ function render() {
     }
 
     filtered.forEach(task => {
+       
         const li = document.createElement("li");
         li.className = "task-item";
         if (task.completed) {
@@ -69,19 +70,30 @@ function render() {
 
         const toggleBtn = document.createElement("button");
         toggleBtn.className = "toggle-btn";
-        toggleBtn.textContent = task.completed ? "↩" : "✓";
+        toggleBtn.textContent = task.completed ? "↩️" : "✓";
+        toggleBtn.title = task.completed ? "Вернуть в работу" : "Отметить выполненной";
         toggleBtn.addEventListener("click", () => toggleTask(task.id));
 
         const deleteBtn = document.createElement("button");
         deleteBtn.className = "delete-btn";
-        deleteBtn.textContent = "🗑";
+        deleteBtn.textContent = "🗑️";
+        deleteBtn.title = "Удалить задачу";
         deleteBtn.addEventListener("click", () => deleteTask(task.id));
 
         li.appendChild(span);
         li.appendChild(toggleBtn);
         li.appendChild(deleteBtn);
+
         list.appendChild(li);
     });
+
+    if (emptyState) {
+        if (tasks.length === 0) {
+            emptyState.classList.remove("hidden");
+        } else {
+            emptyState.classList.add("hidden");
+        }
+    }
 
     updateCounter();
 }
