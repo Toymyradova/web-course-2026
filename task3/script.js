@@ -17,6 +17,7 @@ function addTask() {
     tasks.push({ id: nextId, text: text, completed: false });
     nextId = nextId + 1;
     input.value = "";
+    input.focus();
     render();
 }
 
