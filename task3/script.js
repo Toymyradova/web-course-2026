@@ -1,6 +1,6 @@
-let tasks = [];              
-let currentFilter = "all";   
-let nextId = 1;              
+let tasks = [];
+let currentFilter = "all";
+let nextId = 1;
 
 const input = document.getElementById("task-input");
 const addBtn = document.getElementById("add-btn");
@@ -10,6 +10,7 @@ const filterBtns = document.querySelectorAll(".filter-btn");
 
 function addTask() {
     const text = input.value.trim();
+
     if (text === "") {
         alert("Введите задачу!");
         return;
@@ -23,6 +24,7 @@ function addTask() {
 
     tasks.push(newTask);
     input.value = "";
+    input.focus();
     render();
 }
 
@@ -43,7 +45,7 @@ function updateCounter() {
     const total = tasks.length;
     const completed = tasks.filter(t => t.completed).length;
     const remaining = total - completed;
-    counter.textContent = `Осталось: ${remaining}, Выполнено: ${completed}`;
+    counter.textContent = Осталось: ${remaining}, Выполнено: ${completed};
 }
 
 function render() {
@@ -57,7 +59,6 @@ function render() {
     }
 
     filtered.forEach(task => {
-       
         const li = document.createElement("li");
         li.className = "task-item";
         if (task.completed) {
@@ -70,30 +71,19 @@ function render() {
 
         const toggleBtn = document.createElement("button");
         toggleBtn.className = "toggle-btn";
-        toggleBtn.textContent = task.completed ? "↩️" : "✓";
-        toggleBtn.title = task.completed ? "Вернуть в работу" : "Отметить выполненной";
+        toggleBtn.textContent = task.completed ? "↩" : "✓";
         toggleBtn.addEventListener("click", () => toggleTask(task.id));
 
         const deleteBtn = document.createElement("button");
         deleteBtn.className = "delete-btn";
-        deleteBtn.textContent = "🗑️";
-        deleteBtn.title = "Удалить задачу";
+        deleteBtn.textContent = "🗑";
         deleteBtn.addEventListener("click", () => deleteTask(task.id));
 
         li.appendChild(span);
         li.appendChild(toggleBtn);
         li.appendChild(deleteBtn);
-
         list.appendChild(li);
     });
-
-    if (emptyState) {
-        if (tasks.length === 0) {
-            emptyState.classList.remove("hidden");
-        } else {
-            emptyState.classList.add("hidden");
-        }
-    }
 
     updateCounter();
 }
