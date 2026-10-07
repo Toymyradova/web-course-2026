@@ -3,49 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐍 Змейка</title>
+    <title>🐍 NEON SNAKE</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <header>
-        <h1>🐍 Змейка</h1>
-        <p class="subtitle">Управляй стрелками. Ешь яблоки, не врезайся!</p>
-    </header>
+    <div class="background-grid"></div>
 
-    <main>
-        <div class="score-panel">
-            <div class="score-item">
-                <span class="score-label">Счёт:</span>
-                <span class="score-value" id="score">0</span>
+    <section id="menu-screen" class="menu-screen">
+        <div class="menu-container">
+            <div class="menu-left">
+                <div class="logo-icon">🐍</div>
+                <h1 class="logo-title">SNAKE<span>GAME</span></h1>
+                <p class="logo-sub">Neon Edition · Canvas · JavaScript</p>
+
+                <div class="tech-badges">
+                    <span class="badge">HTML5</span>
+                    <span class="badge">Canvas</span>
+                    <span class="badge">JavaScript</span>
+                </div>
+
+                <button id="new-game-btn" class="btn-primary">▶ НОВАЯ ИГРА</button>
+
+                <div class="rules-mini">
+                    <h3>📖 Как играть</h3>
+                    <ul>
+                        <li>⌨️ Стрелки — движение</li>
+                        <li>🍎 Ешь яблоки — расти</li>
+                        <li>💥 Не врезайся в стены и хвост</li>
+                        <li>⏸ Space — пауза</li>
+                    </ul>
+                </div>
             </div>
-            <div class="score-item">
-                <span class="score-label">Рекорд:</span>
-                <span class="score-value" id="high-score">0</span>
+
+            <div class="menu-right">
+                <div class="records-panel">
+                    <h2>🏆 РЕКОРДЫ</h2>
+                    <ol id="records-list" class="records-list"></ol>
+                    <button id="clear-records-btn" class="btn-clear">🗑 Очистить</button>
+                </div>
             </div>
         </div>
+    </section>
+
+    <section id="game-screen" class="game-screen hidden">
+        <header class="game-header">
+            <button id="back-to-menu-btn" class="btn-back">← Меню</button>
+            <h1 class="game-title">🐍 SNAKE</h1>
+            <button id="pause-btn" class="btn-pause">⏸</button>
+        </header>
+
+        <section class="hud">
+            <div class="hud-card">
+                <div class="hud-label">СЧЁТ</div>
+                <div class="hud-value" id="score">0</div>
+            </div>
+            <div class="hud-card">
+                <div class="hud-label">РЕКОРД</div>
+                <div class="hud-value" id="high-score">0</div>
+            </div>
+            <div class="hud-card">
+                <div class="hud-label">ДЛИНА</div>
+                <div class="hud-value" id="length">3</div>
+            </div>
+        </section>
 
         <div class="canvas-wrapper">
             <canvas id="game-canvas" width="400" height="400"></canvas>
 
-            <div id="overlay" class="overlay hidden">
+            <div id="overlay-pause" class="overlay hidden">
                 <div class="overlay-content">
-                    <div class="overlay-emoji">🐍</div>
-                    <h2>Игра окончена</h2>
-                    <p>Твой счёт: <strong id="final-score">0</strong></p>
-                    <button id="restart-btn" class="restart-btn">🔄 Начать заново</button>
+                    <div class="overlay-title">⏸ ПАУЗА</div>
+                    <p class="overlay-desc">Нажми <kbd>Space</kbd> или кнопку</p>
+                    <button id="resume-btn" class="btn-primary">▶ ПРОДОЛЖИТЬ</button>
+                </div>
+            </div>
+
+            <div id="overlay-gameover" class="overlay hidden">
+                <div class="overlay-content">
+                    <div class="overlay-title red">💀 GAME OVER</div>
+                    <p class="overlay-desc">Твой счёт: <strong id="final-score">0</strong></p>
+                    <p class="overlay-desc small">Длина: <strong id="final-length">0</strong></p>
+                    <div class="overlay-buttons">
+                        <button id="restart-btn" class="btn-primary">🔄 СНОВА</button>
+                        <button id="to-menu-btn" class="btn-secondary">🏠 МЕНЮ</button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="controls-hint">
-            <p>⌨️ Используй стрелки <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd></p>
-        </div>
-    </main>
+        <section class="touch-controls">
+            <button class="touch-btn" data-dir="up">▲</button>
+            <button class="touch-btn" data-dir="left">◀</button>
+            <button class="touch-btn" data-dir="down">▼</button>
+            <button class="touch-btn" data-dir="right">▶</button>
+        </section>
 
-    <footer>
-        <p>© 2026 Тоймырадова Тазегул Тоймырадовна</p>
-    </footer>
+        <section class="hint">
+            <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> — движение · <kbd>Space</kbd> — пауза
+        </section>
+    </section>
+
+    <footer>© 2026 Тоймырадова Тазегул Тоймырадовна</footer>
 
     <script src="script.js" defer></script>
 </body>

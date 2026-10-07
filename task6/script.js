@@ -21,7 +21,6 @@ const overlayGameover = document.getElementById("overlay-gameover");
 
 const finalScoreEl = document.getElementById("final-score");
 const finalLengthEl = document.getElementById("final-length");
-
 const recordsList = document.getElementById("records-list");
 
 const CELL = 20;
@@ -34,7 +33,7 @@ const STORAGE_KEY = "neon-snake-records";
 let snake = [];
 let direction = { x: 1, y: 0 };
 let nextDirection = { x: 1, y: 0 };
-let apple = { x: 0, y: 0 };
+let apple = { x: 5, y: 5 };
 let particles = [];
 let score = 0;
 let records = [];
@@ -45,45 +44,26 @@ let lastMoveTime = 0;
 let rafId = null;
 let audioCtx = null;
 
-function initAudio() {
-    if (!audioCtx) {
-        try {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        } catch (e) { audioCtx = null; }
-    }
-}
-
-function playTone(freq, duration, type, volume) {
-    if (!audioCtx) return;
-    try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type || "square";
-        osc.frequency.value = freq;
-        gain.gain.setValueAtTime(volume || 0.05, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
-    } catch (e) {}
-}
-
 function loadRecords() {
     try {
         const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) records = JSON.parse(stored);
+        records = stored ? JSON.parse(stored) : [];
         if (!Array.isArray(records)) records = [];
-    } catch (e) { records = []; }
+    } catch (e) {
+        records = [];
+    }
     renderRecords();
 }
 
 function saveRecords() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); } catch (e) {}
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    } catch (e) {}
 }
 
 function renderRecords() {
     recordsList.innerHTML = "";
+
     if (records.length === 0) {
         const li = document.createElement("li");
         li.className = "empty";
@@ -103,17 +83,17 @@ function renderRecords() {
         else if (i === 2) place.classList.add("bronze");
         place.textContent = "#" + (i + 1);
 
-        const scoreSpan = document.createElement("span");
-        scoreSpan.className = "score-val";
-        scoreSpan.textContent = r.score;
+        const sc = document.createElement("span");
+        sc.className = "score-val";
+        sc.textContent = r.score;
 
-        const dateSpan = document.createElement("span");
-        dateSpan.className = "date-val";
-        dateSpan.textContent = r.date || "";
+        const dt = document.createElement("span");
+        dt.className = "date-val";
+        dt.textContent = r.date || "";
 
         li.appendChild(place);
-        li.appendChild(scoreSpan);
-        li.appendChild(dateSpan);
+        li.appendChild(sc);
+        li.appendChild(dt);
         recordsList.appendChild(li);
     }
 }
@@ -126,6 +106,32 @@ function addRecord(scoreVal) {
     if (records.length > MAX_RECORDS) records = records.slice(0, MAX_RECORDS);
     saveRecords();
     renderRecords();
+}
+
+function initAudio() {
+    if (!audioCtx) {
+        try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+            audioCtx = null;
+        }
+    }
+}
+
+function playTone(freq, duration, type, volume) {
+    if (!audioCtx) return;
+    try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type || "square";
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(volume || 0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    } catch (e) {}
 }
 
 function initGame() {
@@ -181,9 +187,12 @@ function spawnApple() {
         for (let y = 0; y < ROWS; y++) {
             let occupied = false;
             for (let i = 0; i < snake.length; i++) {
-                if (snake[i].x === x && snake[i].y === y) { occupied = true; break; }
+                if (snake[i].x === x && snake[i].y === y) {
+                    occupied = true;
+                    break;
+                }
             }
-            if (!occupied) free.push({ x, y });
+            if (!occupied) free.push({ x: x, y: y });
         }
     }
     if (free.length === 0) return;
@@ -200,6 +209,264 @@ function moveSnake() {
         score++;
         scoreEl.textContent = score;
         lengthEl.textContent = snake.length;
-        createParticles(apple.x, apple.y)
+        createParticles(apple.x, apple.y, "#ff2d95");
+        playTone(880, 0.08, "square", 0.06);
+        spawnApple();
+    } else {
+        snake.pop();
     }
 }
+
+function createParticles(cx, cy, color) {
+    const px = cx * CELL + CELL / 2;
+    const py = cy * CELL + CELL / 2;
+    for (let i = 0; i < 14; i++) {
+        const angle = (Math.PI * 2 * i) / 14;
+        const speed = 1.5 + Math.random() * 2;
+        particles.push({
+            x: px, y: py,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life: 1, color: color,
+            size: 2 + Math.random() * 2
+        });
+    }
+}
+
+function updateParticles() {
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.94;
+        p.vy *= 0.94;
+        p.life -= 0.03;
+        if (p.life <= 0) particles.splice(i, 1);
+    }
+}
+
+function checkCollision() {
+    const head = snake[0];
+    if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) return true;
+    for (let i = 1; i < snake.length; i++) {
+        if (snake[i].x === head.x && snake[i].y === head.y) return true;
+    }
+    return false;
+}
+
+function update() {
+    if (gameOver || paused) return;
+    if (checkCollision()) endGame();
+}
+
+function draw() {
+    ctx.fillStyle = "#05070f";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawGrid();
+    drawApple();
+    drawSnake();
+    drawParticles();
+}
+
+function drawGrid() {
+    ctx.strokeStyle = "rgba(57, 255, 20, 0.06)";
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= COLS; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * CELL, 0);
+        ctx.lineTo(i * CELL, canvas.height);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, i * CELL);
+        ctx.lineTo(canvas.width, i * CELL);
+        ctx.stroke();
+    }
+}
+
+function drawApple() {
+    const cx = apple.x * CELL + CELL / 2;
+    const cy = apple.y * CELL + CELL / 2;
+    const r = CELL / 2 - 3;
+    const pulse = 1 + Math.sin(Date.now() / 200) * 0.12;
+
+    ctx.save();
+    ctx.shadowColor = "#ff2d95";
+    ctx.shadowBlur = 22;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * pulse, 0, Math.PI * 2);
+    ctx.fillStyle = "#ff2d95";
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * pulse * 0.5, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+    ctx.fill();
+    ctx.restore();
+}
+
+function drawSnake() {
+    for (let i = snake.length - 1; i >= 0; i--) {
+        const seg = snake[i];
+        const x = seg.x * CELL;
+        const y = seg.y * CELL;
+        const pad = 2;
+        const isHead = i === 0;
+        const t = i / Math.max(snake.length - 1, 1);
+        const r = Math.round(57 + (0 - 57) * t);
+        const g = Math.round(255 + (229 - 255) * t);
+        const b = Math.round(20 + (255 - 20) * t);
+        const color = "rgb(" + r + "," + g + "," + b + ")";
+
+        ctx.save();
+        if (isHead) {
+            ctx.shadowColor = "#39ff14";
+            ctx.shadowBlur = 20;
+        } else {
+            ctx.shadowColor = "#00e5ff";
+            ctx.shadowBlur = 8;
+        }
+        ctx.beginPath();
+        roundRect(ctx, x + pad, y + pad, CELL - pad * 2, CELL - pad * 2, isHead ? 6 : 5);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.restore();
+    }
+    drawEyes();
+}
+
+function drawEyes() {
+    const head = snake[0];
+    if (!head) return;
+    const x = head.x * CELL;
+    const y = head.y * CELL;
+    const eyeSize = 3;
+    const offset = 5;
+    let e1x, e1y, e2x, e2y;
+    if (direction.x === 1) {
+        e1x = x + CELL - offset; e1y = y + offset;
+        e2x = x + CELL - offset; e2y = y + CELL - offset;
+    } else if (direction.x === -1) {
+        e1x = x + offset; e1y = y + offset;
+        e2x = x + offset; e2y = y + CELL - offset;
+    } else if (direction.y === -1) {
+        e1x = x + offset; e1y = y + offset;
+        e2x = x + CELL - offset; e2y = y + offset;
+    } else {
+        e1x = x + offset; e1y = y + CELL - offset;
+        e2x = x + CELL - offset; e2y = y + CELL - offset;
+    }
+    ctx.save();
+    ctx.fillStyle = "#05070f";
+    ctx.beginPath();
+    ctx.arc(e1x, e1y, eyeSize, 0, Math.PI * 2);
+    ctx.arc(e2x, e2y, eyeSize, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+}
+
+function drawParticles() {
+    for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        ctx.save();
+        ctx.globalAlpha = Math.max(p.life, 0);
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+}
+
+function roundRect(c, x, y, w, h, r) {
+    c.beginPath();
+    c.moveTo(x + r, y);
+    c.arcTo(x + w, y, x + w, y + h, r);
+    c.arcTo(x + w, y + h, x, y + h, r);
+    c.arcTo(x, y + h, x, y, r);
+    c.arcTo(x, y, x + w, y, r);
+    c.closePath();
+}
+
+function endGame() {
+    gameOver = true;
+    createParticles(snake[0].x, snake[0].y, "#ff3b3b");
+    playTone(120, 0.4, "sawtooth", 0.08);
+    addRecord(score);
+    finalScoreEl.textContent = score;
+    finalLengthEl.textContent = snake.length;
+    overlayGameover.classList.remove("hidden");
+}
+
+function gameLoop(currentTime) {
+    if (!lastMoveTime) lastMoveTime = currentTime;
+    const delta = currentTime - lastMoveTime;
+
+    if (delta >= MOVE_INTERVAL) {
+        if (started && !gameOver && !paused) {
+            moveSnake();
+            update();
+        }
+        lastMoveTime = currentTime;
+    }
+
+    updateParticles();
+    draw();
+
+    if (!gameOver) {
+        rafId = requestAnimationFrame(gameLoop);
+    }
+}
+
+function togglePause() {
+    if (!started || gameOver) return;
+    paused = !paused;
+    if (paused) {
+        overlayPause.classList.remove("hidden");
+    } else {
+        overlayPause.classList.add("hidden");
+        lastMoveTime = 0;
+        rafId = requestAnimationFrame(gameLoop);
+    }
+}
+
+function changeDirection(dir) {
+    if (gameOver || paused) return;
+    if (dir === "up" && direction.y !== 1) nextDirection = { x: 0, y: -1 };
+    else if (dir === "down" && direction.y !== -1) nextDirection = { x: 0, y: 1 };
+    else if (dir === "left" && direction.x !== 1) nextDirection = { x: -1, y: 0 };
+    else if (dir === "right" && direction.x !== -1) nextDirection = { x: 1, y: 0 };
+}
+
+document.addEventListener("keydown", function (e) {
+    const k = e.key;
+    if (k === "ArrowUp")    { changeDirection("up");    e.preventDefault(); }
+    if (k === "ArrowDown")  { changeDirection("down");  e.preventDefault(); }
+    if (k === "ArrowLeft")  { changeDirection("left");  e.preventDefault(); }
+    if (k === "ArrowRight") { changeDirection("right"); e.preventDefault(); }
+    if (k === " " || k === "Spacebar") { togglePause(); e.preventDefault(); }
+});
+
+document.querySelectorAll(".touch-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+        changeDirection(btn.dataset.dir);
+    });
+});
+
+newGameBtn.addEventListener("click", showGame);
+backToMenuBtn.addEventListener("click", showMenu);
+toMenuBtn.addEventListener("click", showMenu);
+restartBtn.addEventListener("click", initGame);
+resumeBtn.addEventListener("click", togglePause);
+pauseBtn.addEventListener("click", togglePause);
+
+clearRecordsBtn.addEventListener("click", function () {
+    if (confirm("Удалить все рекорды?")) {
+        records = [];
+        saveRecords();
+        renderRecords();
+    }
+});
+
+loadRecords();
