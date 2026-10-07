@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Симон говорит</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🎮 Симон говорит</h1>
+        <p class="subtitle">Запомни последовательность и повтори!</p>
+    </header>
+
+    <main>
+        <div class="game-board" id="game-board">
+            <button class="simon-btn red" data-index="0"></button>
+            <button class="simon-btn blue" data-index="1"></button>
+            <button class="simon-btn green" data-index="2"></button>
+            <button class="simon-btn yellow" data-index="3"></button>
+        </div>
+
+        <div class="info">
+            <div class="level-display">Уровень: <strong id="level">0</strong></div>
+            <div class="status" id="status">Нажми «Старт», чтобы начать</div>
+        </div>
+
+        <div class="controls">
+            <button id="start-btn" class="start-btn">▶ Старт</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 Тоймырадова Тазегул Тоймырадовна</p>
+    </footer>
+
+    <script src="script.js" defer></script>
+</body>
+</html>
