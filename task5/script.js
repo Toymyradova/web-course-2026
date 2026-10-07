@@ -9,6 +9,7 @@ const buttons = document.querySelectorAll(".simon-btn");
 const startBtn = document.getElementById("start-btn");
 const levelEl = document.getElementById("level");
 const statusEl = document.getElementById("status");
+const board = document.getElementById("game-board");
 
 const COLORS_COUNT = 4;
 const SHOW_DELAY = 600;
@@ -21,8 +22,14 @@ function clearAllTimers() {
     timers = [];
 }
 
-function setStatus(text) {
+function setStatus(text, type) {
     statusEl.textContent = text;
+    statusEl.className = "status";
+    if (type === "good") {
+        statusEl.classList.add("good");
+    } else if (type === "bad") {
+        statusEl.classList.add("bad");
+    }
 }
 
 function updateLevel() {
@@ -45,7 +52,7 @@ function lightUpButton(index, duration, callback) {
 
 function showSequence() {
     isShowingSequence = true;
-    setStatus("Смотри внимательно...");
+    setStatus("👀 Смотри внимательно...", "");
 
     for (let i = 0; i < sequence.length; i++) {
         const index = sequence[i];
@@ -63,7 +70,7 @@ function showSequence() {
     const tEnd = setTimeout(function () {
         isShowingSequence = false;
         playerIndex = 0;
-        setStatus("Твой ход! Повтори последовательность.");
+        setStatus("🎯 Твой ход! Повтори последовательность.", "");
     }, totalTime);
 
     timers.push(tEnd);
@@ -81,6 +88,14 @@ function nextRound() {
     showSequence();
 }
 
+function showBoardEffect(effect) {
+    board.classList.add(effect);
+    const t = setTimeout(function () {
+        board.classList.remove(effect);
+    }, 700);
+    timers.push(t);
+}
+
 function handleButtonClick(index) {
     if (isShowingSequence || !gameActive) {
         return;
@@ -92,13 +107,18 @@ function handleButtonClick(index) {
         playerIndex = playerIndex + 1;
 
         if (playerIndex === sequence.length) {
+            setStatus("✅ Отлично! Следующий уровень...", "good");
+            showBoardEffect("correct");
             playerIndex = 0;
-            setStatus("✅ Верно! Следующий уровень...");
-            setTimeout(function () {
+
+            const t = setTimeout(function () {
                 nextRound();
-            }, 800);
+            }, 900);
+            timers.push(t);
         }
     } else {
+        setStatus("❌ Ошибка! Ты дошёл до уровня " + level, "bad");
+        showBoardEffect("wrong");
         gameOver();
     }
 }
@@ -108,7 +128,6 @@ function gameOver() {
     isShowingSequence = false;
     clearAllTimers();
 
-    setStatus("❌ Ошибка! Ты дошёл до уровня " + level);
     startBtn.textContent = "🔄 Играть снова";
 
     buttons.forEach(function (btn) {
@@ -125,16 +144,17 @@ function startGame() {
     isShowingSequence = false;
 
     updateLevel();
-    setStatus("🎮 Игра началась!");
+    setStatus("🎮 Игра началась! Приготовься...", "");
     startBtn.textContent = "🔄 Новая игра";
 
     buttons.forEach(function (btn) {
         btn.disabled = false;
     });
 
-    setTimeout(function () {
+    const t = setTimeout(function () {
         nextRound();
-    }, 500);
+    }, 600);
+    timers.push(t);
 }
 
 buttons.forEach(function (btn) {
