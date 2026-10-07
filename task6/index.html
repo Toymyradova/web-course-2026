@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐍 Змейка</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🐍 Змейка</h1>
+        <p class="subtitle">Управляй стрелками. Ешь яблоки, не врезайся!</p>
+    </header>
+
+    <main>
+        <div class="score-panel">
+            <div class="score-item">
+                <span class="score-label">Счёт:</span>
+                <span class="score-value" id="score">0</span>
+            </div>
+            <div class="score-item">
+                <span class="score-label">Рекорд:</span>
+                <span class="score-value" id="high-score">0</span>
+            </div>
+        </div>
+
+        <div class="canvas-wrapper">
+            <canvas id="game-canvas" width="400" height="400"></canvas>
+
+            <div id="overlay" class="overlay hidden">
+                <div class="overlay-content">
+                    <div class="overlay-emoji">🐍</div>
+                    <h2>Игра окончена</h2>
+                    <p>Твой счёт: <strong id="final-score">0</strong></p>
+                    <button id="restart-btn" class="restart-btn">🔄 Начать заново</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-hint">
+            <p>⌨️ Используй стрелки <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd></p>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 Тоймырадова Тазегул Тоймырадовна</p>
+    </footer>
+
+    <script src="script.js" defer></script>
+</body>
+</html>
