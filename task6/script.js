@@ -1,24 +1,132 @@
 const canvas = document.getElementById("game-canvas");
 const ctx = canvas.getContext("2d");
+
+const menuScreen = document.getElementById("menu-screen");
+const gameScreen = document.getElementById("game-screen");
+
+const newGameBtn = document.getElementById("new-game-btn");
+const backToMenuBtn = document.getElementById("back-to-menu-btn");
+const pauseBtn = document.getElementById("pause-btn");
+const resumeBtn = document.getElementById("resume-btn");
+const restartBtn = document.getElementById("restart-btn");
+const toMenuBtn = document.getElementById("to-menu-btn");
+const clearRecordsBtn = document.getElementById("clear-records-btn");
+
 const scoreEl = document.getElementById("score");
 const highScoreEl = document.getElementById("high-score");
-const overlay = document.getElementById("overlay");
-const finalScoreEl = document.getElementById("final-score");
-const restartBtn = document.getElementById("restart-btn");
+const lengthEl = document.getElementById("length");
 
-const CELL_SIZE = 20;
-const CELLS_COUNT = canvas.width / CELL_SIZE;
-const MOVE_INTERVAL = 150;
+const overlayPause = document.getElementById("overlay-pause");
+const overlayGameover = document.getElementById("overlay-gameover");
+
+const finalScoreEl = document.getElementById("final-score");
+const finalLengthEl = document.getElementById("final-length");
+
+const recordsList = document.getElementById("records-list");
+
+const CELL = 20;
+const COLS = canvas.width / CELL;
+const ROWS = canvas.height / CELL;
+const MOVE_INTERVAL = 140;
+const MAX_RECORDS = 5;
+const STORAGE_KEY = "neon-snake-records";
 
 let snake = [];
 let direction = { x: 1, y: 0 };
 let nextDirection = { x: 1, y: 0 };
 let apple = { x: 0, y: 0 };
+let particles = [];
 let score = 0;
-let highScore = 0;
+let records = [];
 let gameOver = false;
+let paused = false;
+let started = false;
 let lastMoveTime = 0;
-let animationId = null;
+let rafId = null;
+let audioCtx = null;
+
+function initAudio() {
+    if (!audioCtx) {
+        try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) { audioCtx = null; }
+    }
+}
+
+function playTone(freq, duration, type, volume) {
+    if (!audioCtx) return;
+    try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type || "square";
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(volume || 0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    } catch (e) {}
+}
+
+function loadRecords() {
+    try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) records = JSON.parse(stored);
+        if (!Array.isArray(records)) records = [];
+    } catch (e) { records = []; }
+    renderRecords();
+}
+
+function saveRecords() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); } catch (e) {}
+}
+
+function renderRecords() {
+    recordsList.innerHTML = "";
+    if (records.length === 0) {
+        const li = document.createElement("li");
+        li.className = "empty";
+        li.textContent = "Пока нет рекордов";
+        recordsList.appendChild(li);
+        return;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+        const r = records[i];
+        const li = document.createElement("li");
+
+        const place = document.createElement("span");
+        place.className = "place";
+        if (i === 0) place.classList.add("gold");
+        else if (i === 1) place.classList.add("silver");
+        else if (i === 2) place.classList.add("bronze");
+        place.textContent = "#" + (i + 1);
+
+        const scoreSpan = document.createElement("span");
+        scoreSpan.className = "score-val";
+        scoreSpan.textContent = r.score;
+
+        const dateSpan = document.createElement("span");
+        dateSpan.className = "date-val";
+        dateSpan.textContent = r.date || "";
+
+        li.appendChild(place);
+        li.appendChild(scoreSpan);
+        li.appendChild(dateSpan);
+        recordsList.appendChild(li);
+    }
+}
+
+function addRecord(scoreVal) {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit" });
+    records.push({ score: scoreVal, date: dateStr });
+    records.sort(function (a, b) { return b.score - a.score; });
+    if (records.length > MAX_RECORDS) records = records.slice(0, MAX_RECORDS);
+    saveRecords();
+    renderRecords();
+}
 
 function initGame() {
     snake = [
@@ -28,255 +136,70 @@ function initGame() {
     ];
     direction = { x: 1, y: 0 };
     nextDirection = { x: 1, y: 0 };
+    particles = [];
     score = 0;
     gameOver = false;
+    paused = false;
+    started = true;
     lastMoveTime = 0;
 
     scoreEl.textContent = "0";
-    overlay.classList.add("hidden");
+    lengthEl.textContent = "3";
+    highScoreEl.textContent = records.length > 0 ? records[0].score : "0";
+
+    overlayPause.classList.add("hidden");
+    overlayGameover.classList.add("hidden");
 
     spawnApple();
     draw();
-    if (animationId) {
-        cancelAnimationFrame(animationId);
-    }
-    animationId = requestAnimationFrame(gameLoop);
+
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(gameLoop);
+}
+
+function showGame() {
+    menuScreen.classList.add("hidden");
+    gameScreen.classList.remove("hidden");
+    initAudio();
+    initGame();
+}
+
+function showMenu() {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = null;
+    started = false;
+    gameOver = true;
+    paused = false;
+    gameScreen.classList.add("hidden");
+    menuScreen.classList.remove("hidden");
+    highScoreEl.textContent = records.length > 0 ? records[0].score : "0";
 }
 
 function spawnApple() {
-    let freeCells = [];
-    for (let x = 0; x < CELLS_COUNT; x++) {
-        for (let y = 0; y < CELLS_COUNT; y++) {
+    const free = [];
+    for (let x = 0; x < COLS; x++) {
+        for (let y = 0; y < ROWS; y++) {
             let occupied = false;
             for (let i = 0; i < snake.length; i++) {
-                if (snake[i].x === x && snake[i].y === y) {
-                    occupied = true;
-                    break;
-                }
+                if (snake[i].x === x && snake[i].y === y) { occupied = true; break; }
             }
-            if (!occupied) {
-                freeCells.push({ x: x, y: y });
-            }
+            if (!occupied) free.push({ x, y });
         }
     }
-    if (freeCells.length === 0) {
-        return;
-    }
-    const randomIndex = Math.floor(Math.random() * freeCells.length);
-    apple = freeCells[randomIndex];
+    if (free.length === 0) return;
+    apple = free[Math.floor(Math.random() * free.length)];
 }
 
 function moveSnake() {
     direction = nextDirection;
-
     const head = snake[0];
-    const newHead = {
-        x: head.x + direction.x,
-        y: head.y + direction.y
-    };
-
+    const newHead = { x: head.x + direction.x, y: head.y + direction.y };
     snake.unshift(newHead);
 
     if (newHead.x === apple.x && newHead.y === apple.y) {
-        score = score + 1;
+        score++;
         scoreEl.textContent = score;
-        spawnApple();
-    } else {
-        snake.pop();
+        lengthEl.textContent = snake.length;
+        createParticles(apple.x, apple.y)
     }
 }
-
-function checkCollision() {
-    const head = snake[0];
-
-    if (head.x < 0 || head.x >= CELLS_COUNT || head.y < 0 || head.y >= CELLS_COUNT) {
-        return true;
-    }
-
-    for (let i = 1; i < snake.length; i++) {
-        if (snake[i].x === head.x && snake[i].y === head.y) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-function update() {
-    if (gameOver) {
-        return;
-    }
-
-    if (checkCollision()) {
-        endGame();
-        return;
-    }
-}
-
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    drawGrid();
-    drawApple();
-    drawSnake();
-}
-
-function drawGrid() {
-    ctx.strokeStyle = "rgba(16, 185, 129, 0.08)";
-    ctx.lineWidth = 1;
-    for (let i = 0; i <= CELLS_COUNT; i++) {
-        ctx.beginPath();
-        ctx.moveTo(i * CELL_SIZE, 0);
-        ctx.lineTo(i * CELL_SIZE, canvas.height);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(0, i * CELL_SIZE);
-        ctx.lineTo(canvas.width, i * CELL_SIZE);
-        ctx.stroke();
-    }
-}
-
-function drawApple() {
-    const cx = apple.x * CELL_SIZE + CELL_SIZE / 2;
-    const cy = apple.y * CELL_SIZE + CELL_SIZE / 2;
-    const r = CELL_SIZE / 2 - 2;
-
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fillStyle = "#ef4444";
-    ctx.shadowColor = "rgba(239, 68, 68, 0.6)";
-    ctx.shadowBlur = 10;
-    ctx.fill();
-    ctx.shadowBlur = 0;
-
-    ctx.beginPath();
-    ctx.arc(cx - 3, cy - 3, 2.5, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-    ctx.fill();
-}
-
-function drawSnake() {
-    for (let i = 0; i < snake.length; i++) {
-        const seg = snake[i];
-        const x = seg.x * CELL_SIZE;
-        const y = seg.y * CELL_SIZE;
-
-        const padding = 2;
-        const radius = 6;
-
-        ctx.beginPath();
-        ctx.roundRect(x + padding, y + padding, CELL_SIZE - padding * 2, CELL_SIZE - padding * 2, radius);
-
-        if (i === 0) {
-            ctx.fillStyle = "#059669";
-            ctx.shadowColor = "rgba(5, 150, 105, 0.5)";
-            ctx.shadowBlur = 12;
-        } else {
-            const gradient = ctx.createLinearGradient(x, y, x + CELL_SIZE, y + CELL_SIZE);
-            gradient.addColorStop(0, "#10b981");
-            gradient.addColorStop(1, "#34d399");
-            ctx.fillStyle = gradient;
-            ctx.shadowBlur = 0;
-        }
-        ctx.fill();
-        ctx.shadowBlur = 0;
-    }
-
-    drawEyes();
-}
-
-function drawEyes() {
-    const head = snake[0];
-    const x = head.x * CELL_SIZE;
-    const y = head.y * CELL_SIZE;
-    const eyeSize = 3;
-    const offset = 5;
-
-    ctx.fillStyle = "white";
-
-    let eye1X, eye1Y, eye2X, eye2Y;
-    if (direction.x === 1) {
-        eye1X = x + CELL_SIZE - offset; eye1Y = y + offset;
-        eye2X = x + CELL_SIZE - offset; eye2Y = y + CELL_SIZE - offset;
-    } else if (direction.x === -1) {
-        eye1X = x + offset; eye1Y = y + offset;
-        eye2X = x + offset; eye2Y = y + CELL_SIZE - offset;
-    } else if (direction.y === -1) {
-        eye1X = x + offset; eye1Y = y + offset;
-        eye2X = x + CELL_SIZE - offset; eye2Y = y + offset;
-    } else {
-        eye1X = x + offset; eye1Y = y + CELL_SIZE - offset;
-        eye2X = x + CELL_SIZE - offset; eye2Y = y + CELL_SIZE - offset;
-    }
-
-    ctx.beginPath();
-    ctx.arc(eye1X, eye1Y, eyeSize, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(eye2X, eye2Y, eyeSize, 0, Math.PI * 2);
-    ctx.fill();
-}
-
-function endGame() {
-    gameOver = true;
-    finalScoreEl.textContent = score;
-
-    if (score > highScore) {
-        highScore = score;
-        highScoreEl.textContent = highScore;
-    }
-
-    overlay.classList.remove("hidden");
-}
-
-function gameLoop(currentTime) {
-    if (!lastMoveTime) {
-        lastMoveTime = currentTime;
-    }
-
-    const deltaTime = currentTime - lastMoveTime;
-
-    if (deltaTime >= MOVE_INTERVAL) {
-        if (!gameOver) {
-            moveSnake();
-            update();
-        }
-        lastMoveTime = currentTime;
-    }
-
-    draw();
-
-    if (!gameOver) {
-        animationId = requestAnimationFrame(gameLoop);
-    }
-}
-
-document.addEventListener("keydown", function (e) {
-    if (gameOver) {
-        return;
-    }
-
-    const key = e.key;
-
-    if (key === "ArrowUp" && direction.y !== 1) {
-        nextDirection = { x: 0, y: -1 };
-        e.preventDefault();
-    } else if (key === "ArrowDown" && direction.y !== -1) {
-        nextDirection = { x: 0, y: 1 };
-        e.preventDefault();
-    } else if (key === "ArrowLeft" && direction.x !== 1) {
-        nextDirection = { x: -1, y: 0 };
-        e.preventDefault();
-    } else if (key === "ArrowRight" && direction.x !== -1) {
-        nextDirection = { x: 1, y: 0 };
-        e.preventDefault();
-    }
-});
-
-restartBtn.addEventListener("click", function () {
-    initGame();
-});
-
-initGame();
