@@ -1,38 +1,3 @@
-(function () {
-    "use strict";
-
-    const Controller = {
-        model: null,
-        view: null,
-
-        init: function (model, view) {
-            this.model = model;
-            this.view = view;
-
-            this.view.init();
-            this.bindEvents();
-            this.loadNextPage();
-        },
-
-        bindEvents: function () {
-            const self = this;
-
-            window.addEventListener("scroll", function () {
-                const scrollTop = window.scrollY || document.documentElement.scrollTop;
-                const windowHeight = window.innerHeight;
-                const documentHeight = document.documentElement.scrollHeight;
-
-                if (scrollTop + windowHeight >= documentHeight - 200) {
-                    self.loadNextPage();
-                }
-            });
-
-            this.view.bindSearch(function (searchTerm) {
-                const filtered = self.model.filterPosts(searchTerm);
-                self.view.renderPosts(filtered);
-            });
-        },
-
         loadNextPage: async function () {
             if (this.model.isLoading || !this.model.hasMorePosts) return;
 
@@ -45,16 +10,18 @@
 
             if (result && result.success) {
                 this.view.renderPosts(this.model.filteredPosts);
-                if (!this.model.hasMorePosts) {
+                
+                // Если данные локальные (нет интернета) - покажем сообщение, но не красное
+                if (result.isFallback) {
+                    this.view.showError("Нет подключения к интернету. Показаны локальные данные.");
+                    this.view.elements.errorMessage.style.background = "#fefcbf";
+                    this.view.elements.errorMessage.style.color = "#744210";
+                } 
+                // Если посты закончились
+                else if (!this.model.hasMorePosts) {
                     this.view.showEndMessage();
                 }
             } else if (result) {
                 this.view.showError(`Не удалось загрузить посты: ${result.error}`);
             }
         }
-    };
-
-    document.addEventListener("DOMContentLoaded", function () {
-        Controller.init(window.PostsModel, window.PostsView);
-    });
-})();
