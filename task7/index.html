@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📰 Лента постов</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>📰 Бесконечная лента</h1>
+        <p>Данные загружаются с jsonplaceholder.typicode.com</p>
+    </header>
+
+    <main>
+        <div class="search-wrapper">
+            <input type="text" id="search-input" placeholder="Поиск по заголовку...">
+        </div>
+
+        <div id="posts-container" class="posts-grid"></div>
+
+        <div id="loader" class="loader hidden">
+            <div class="spinner"></div>
+            <p>Загрузка...</p>
+        </div>
+
+        <div id="error-message" class="error-msg hidden"></div>
+
+        <div id="end-message" class="end-msg hidden">Больше постов нет</div>
+    </main>
+
+    <footer>
+        <p>© 2026 Тоймырадова Тазегул Тоймырадовна</p>
+    </footer>
+
+    <script src="model.js" defer></script>
+    <script src="view.js" defer></script>
+    <script src="controller.js" defer></script>
+</body>
+</html>
