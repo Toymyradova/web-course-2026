@@ -32,10 +32,8 @@ async function loadData() {
     try {
         elements.loader.classList.remove('hidden');
         
-        const [categories, transactions] = await Promise.all([
-            api.getCategories(),
-            api.getTransactions()
-        ]);
+        const categories = await api.getCategories();
+        const transactions = await api.getTransactions();
 
         ui.renderCategories(categories, elements.category);
         allTransactions = transactions;
@@ -45,7 +43,7 @@ async function loadData() {
 
     } catch (error) {
         elements.loader.classList.add('hidden');
-        ui.showError('Не удалось подключиться к серверу. Запущен ли json-server?', elements.error);
+        ui.showError('Не удалось загрузить данные.', elements.error);
     }
 }
 
@@ -56,6 +54,12 @@ function updateUI() {
 
 async function handleSubmit(e) {
     e.preventDefault();
+
+    // Проверка, выбрана ли категория
+    if (!elements.category.value) {
+        ui.showError('Пожалуйста, выберите категорию из списка!', elements.error);
+        return;
+    }
 
     const id = elements.idInput.value;
     const data = {
