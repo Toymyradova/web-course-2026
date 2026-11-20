@@ -3,36 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📰 Лента постов</title>
+    <title>Пастельная лента</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header>
-        <h1>📰 Бесконечная лента</h1>
-        <p>Данные загружаются с jsonplaceholder.typicode.com</p>
-    </header>
+    <div class="app">
+        <header class="app-header">
+            <h1>Пастельная лента</h1>
+            <p class="subtitle">Посты из космоса (jsonplaceholder)</p>
+            
+            <div class="search-wrapper">
+                <input type="search" id="search" class="search-input" placeholder="Поиск по заголовку..." autocomplete="off">
+            </div>
+        </header>
 
-    <main>
-        <div class="search-wrapper">
-            <input type="text" id="search-input" placeholder="Поиск по заголовку...">
-        </div>
+        <div class="stats" id="stats"></div>
 
-        <div id="posts-container" class="posts-grid"></div>
+        <main class="posts" id="posts"></main>
 
-        <div id="loader" class="loader hidden">
+        <div class="state hidden" id="loading">
             <div class="spinner"></div>
-            <p>Загрузка...</p>
+            <p>Загрузка…</p>
         </div>
 
-        <div id="error-message" class="error-msg hidden"></div>
+        <div class="state error hidden" id="error"></div>
 
-        <div id="end-message" class="end-msg hidden">Больше постов нет</div>
-    </main>
+        <div class="state empty hidden" id="empty">
+            <p>Постов не найдено</p>
+        </div>
 
-    <footer>
-        <p>© 2026 Тоймырадова Тазегул Тоймырадовна</p>
-    </footer>
+        <div class="state end hidden" id="end">
+            <p>Больше постов нет</p>
+        </div>
+    </div>
+
+    <button class="btn-up hidden" id="btn-up" title="Наверх">↑</button>
 
     <script src="model.js" defer></script>
     <script src="view.js" defer></script>
