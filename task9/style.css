@@ -1,0 +1,36 @@
+.filters-section {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+@media (min-width: 600px) {
+    .filters-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+main {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+}
+
+@media (min-width: 900px) {
+    main {
+        grid-template-columns: 1fr 1.5fr;
+    }
+}
+
+.category-form {
+    margin-top: 20px;
+    border-color: rgba(56, 189, 248, 0.3);
+}
