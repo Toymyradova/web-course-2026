@@ -101,7 +101,7 @@
             }
         },
 
-        // 6. Главный игровой цикл (вызывается ~60 раз в секунду)
+        // 6. Главный игровой цикл 
         gameLoop: function (currentTime) {
             if (!this.lastMoveTime) this.lastMoveTime = currentTime;
             const delta = currentTime - this.lastMoveTime; // Сколько времени прошло

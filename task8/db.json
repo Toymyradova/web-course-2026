@@ -1,0 +1,9 @@
+{
+  "transactions": [],
+  "categories": [
+    { "id": 1, "name": "Еда", "type": "expense" },
+    { "id": 2, "name": "Зарплата", "type": "income" },
+    { "id": 3, "name": "Развлечения", "type": "expense" },
+    { "id": 4, "name": "Фриланс", "type": "income" }
+  ]
+}

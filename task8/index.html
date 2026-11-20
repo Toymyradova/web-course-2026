@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💰 Zen-Money</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app">
+        <header>
+            <h1>💰 Zen-Money</h1>
+            <div class="balance">
+                <div class="balance-item income">Доходы: <span id="total-income">0</span> ₽</div>
+                <div class="balance-item expense">Расходы: <span id="total-expense">0</span> ₽</div>
+                <div class="balance-item total">Баланс: <span id="total-balance">0</span> ₽</div>
+            </div>
+        </header>
+
+        <main>
+            <section class="form-section">
+                <h2 id="form-title">Новая операция</h2>
+                <form id="transaction-form">
+                    <input type="hidden" id="transaction-id">
+                    
+                    <div class="form-row">
+                        <input type="number" id="amount" placeholder="Сумма" required min="1">
+                        
+                        <select id="type">
+                            <option value="expense">Расход</option>
+                            <option value="income">Доход</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <select id="category" required>
+                            <option value="">Выберите категорию...</option>
+                        </select>
+                        <input type="date" id="date" required>
+                    </div>
+
+                    <input type="text" id="comment" placeholder="Комментарий (необязательно)">
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-save" id="submit-btn">Добавить</button>
+                        <button type="button" class="btn-cancel hidden" id="cancel-btn">Отмена</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="list-section">
+                <h2>История операций</h2>
+                <div id="loader" class="hidden">Загрузка...</div>
+                <div id="error" class="error hidden"></div>
+                <ul id="transactions-list" class="transactions-list"></ul>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
