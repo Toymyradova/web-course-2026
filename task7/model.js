@@ -1,19 +1,16 @@
 (function () {
     "use strict";
 
-    // Конфигурация
     const API_URL = 'https://jsonplaceholder.typicode.com/posts';
     const POSTS_PER_PAGE = 10;
     const TOTAL_POSTS = 100;
 
-    // Состояние (данные)
     let allPosts = [];
     let currentPage = 1;
     let isLoading = false;
     let hasMore = true;
     let errorMsg = null;
 
-    // 1. Загрузка следующей страницы (async/await)
     async function loadNextPage() {
         if (isLoading || !hasMore) return;
 
@@ -45,14 +42,12 @@
         }
     }
 
-    // 2. Фильтрация (поиск по заголовку)
     function filterPosts(query) {
         if (!query) return allPosts;
         const lowerQuery = query.trim().toLowerCase();
         return allPosts.filter(post => post.title.toLowerCase().includes(lowerQuery));
     }
 
-    // 3. Экспорт данных (геттеры)
     function getPosts() { return allPosts; }
     function getIsLoading() { return isLoading; }
     function getHasMore() { return hasMore; }
@@ -60,7 +55,6 @@
     function getTotalLoaded() { return allPosts.length; }
     function getTotalPosts() { return TOTAL_POSTS; }
 
-    // Прикрепляем функции к глобальному объекту
     window.PostsModel = {
         loadNextPage,
         filterPosts,

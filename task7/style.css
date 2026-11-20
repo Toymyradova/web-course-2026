@@ -1,20 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 
 :root {
-    --bg-page: #F8FAFC;
-    --bg-card: #FFFFFF;
-    --purple: #A78BFA;
-    --purple-light: #C4B5FD;
-    --purple-dark: #7C3AED;
-    --pink: #FBCFE8;
-    --mint: #A7F3D0;
-    --peach: #FED7AA;
-    --text: #3F3F46;
-    --text-light: #71717A;
-    --accent: #FBBF24;
-    --highlight: #FEF08A;
-    --radius: 16px;
-    --transition: 0.3s ease;
+    --bg-main: #0B1120;      
+    --bg-card: rgba(30, 41, 59, 0.7); 
+    --text-main: #F8FAFC;    
+    --text-muted: #94A3B8;    
+    --accent: #38BDF8;        
+    --accent-glow: rgba(56, 189, 248, 0.3); 
+    --border: rgba(255, 255, 255, 0.1); 
+    --radius: 20px;
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
@@ -24,169 +19,207 @@
 }
 
 body {
-    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-    background: var(--bg-page);
-    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.08), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
+    color: var(--text-main);
     line-height: 1.6;
     min-height: 100vh;
-    padding: 30px 20px;
+    padding: 40px 20px;
+    background-attachment: fixed;
 }
 
 .app {
-    max-width: 700px;
+    max-width: 800px;
     margin: 0 auto;
 }
 
-/* --- Шапка --- */
 .app-header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
 }
 
 .app-header h1 {
-    font-size: 2rem;
-    color: var(--purple-dark);
-    letter-spacing: 1px;
-    margin-bottom: 5px;
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #38BDF8, #818CF8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px var(--accent-glow);
 }
 
 .subtitle {
-    color: var(--text-light);
-    font-size: 0.9rem;
-    font-style: italic;
-    margin-bottom: 20px;
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 30px;
 }
 
-/* --- Поиск --- */
 .search-wrapper {
-    max-width: 500px;
+    max-width: 600px;
     margin: 0 auto;
+    position: relative;
 }
 
 .search-input {
     width: 100%;
-    min-height: 48px;
-    padding: 12px 20px;
+    min-height: 54px;
+    padding: 15px 25px;
     font-size: 1rem;
     font-family: inherit;
-    color: var(--text);
+    font-weight: 500;
+    color: var(--text-main);
     background: var(--bg-card);
-    border: 2px solid var(--purple-light);
-    border-radius: 25px;
+    border: 1px solid var(--border);
+    border-radius: 30px;
     outline: none;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     transition: all var(--transition);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .search-input::placeholder {
-    color: var(--text-light);
+    color: #64748B;
 }
 
 .search-input:focus {
-    border-color: var(--purple);
-    box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.2);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-glow), 0 4px 20px rgba(0, 0, 0, 0.3);
+    background: rgba(30, 41, 59, 0.9);
 }
 
-/* --- Статистика --- */
 .stats {
     text-align: center;
-    color: var(--text-light);
-    font-size: 0.85rem;
-    margin-bottom: 20px;
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 30px;
     min-height: 20px;
+    letter-spacing: 0.5px;
 }
 
-/* --- Посты --- */
 .posts {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    margin-bottom: 20px;
+    gap: 24px;
+    margin-bottom: 30px;
 }
 
 .post-card {
     background: var(--bg-card);
-    padding: 25px;
+    padding: 30px;
     border-radius: var(--radius);
-    box-shadow: 0 4px 20px rgba(167, 139, 250, 0.15);
-    border-left: 6px solid var(--purple);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     transition: all var(--transition);
-    animation: fadeInUp 0.4s ease;
+    animation: slideUp 0.5s ease forwards;
+    opacity: 0;
+    transform: translateY(20px);
+    position: relative;
+    overflow: hidden;
+}
+
+.post-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: linear-gradient(to bottom, #38BDF8, #818CF8);
+    opacity: 0;
+    transition: opacity var(--transition);
 }
 
 .post-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(167, 139, 250, 0.25);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--accent-glow);
+    border-color: rgba(56, 189, 248, 0.3);
 }
 
-/* Разные цвета для карточек */
-.post-card.color-0 { border-left-color: var(--purple); }
-.post-card.color-1 { border-left-color: var(--pink); }
-.post-card.color-2 { border-left-color: var(--mint); }
-.post-card.color-3 { border-left-color: var(--peach); }
-.post-card.color-4 { border-left-color: var(--accent); }
+.post-card:hover::before {
+    opacity: 1;
+}
 
 .post-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
-    font-size: 0.85rem;
+    margin-bottom: 20px;
 }
 
 .post-author {
     display: flex;
     align-items: center;
-    gap: 10px;
-    color: var(--text-light);
+    gap: 12px;
+    color: var(--text-main);
     font-weight: 600;
+    font-size: 0.9rem;
 }
 
 .post-avatar {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--purple-light);
+    border: 2px solid var(--border);
+    padding: 2px;
+    background: var(--bg-main);
 }
 
 .post-id {
-    color: var(--purple);
+    color: var(--accent);
     font-weight: 700;
-    font-size: 0.8rem;
-    background: rgba(167, 139, 250, 0.15);
-    padding: 4px 10px;
-    border-radius: 10px;
+    font-size: 0.75rem;
+    background: rgba(56, 189, 248, 0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    letter-spacing: 1px;
 }
 
 .post-title {
-    font-size: 1.2rem;
-    color: var(--text);
-    margin-bottom: 10px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 12px;
     line-height: 1.4;
     text-transform: capitalize;
 }
 
 .post-body {
-    color: var(--text-light);
-    font-size: 0.95rem;
-    line-height: 1.6;
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.7;
 }
 
-/* Подсветка найденного текста */
 .post-title mark {
-    background: var(--highlight);
-    color: var(--text);
-    padding: 0 3px;
-    border-radius: 3px;
-    font-weight: 700;
+    background: var(--accent);
+    color: #0B1120;
+    padding: 0 4px;
+    border-radius: 4px;
+    font-weight: 800;
 }
 
-/* --- Состояния (загрузка, ошибка, конец) --- */
 .state {
     text-align: center;
-    padding: 30px 20px;
-    color: var(--text-light);
-    font-style: italic;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-weight: 500;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    border: 1px dashed var(--border);
+    backdrop-filter: blur(10px);
+    margin-top: 20px;
 }
 
 .state.hidden {
@@ -194,20 +227,18 @@ body {
 }
 
 .state.error {
-    background: #FEE2E2;
-    color: #991B1B;
-    border-radius: var(--radius);
-    font-style: normal;
-    font-weight: 600;
+    background: rgba(239, 68, 68, 0.1);
+    color: #FCA5A5;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-style: solid;
 }
 
-/* Спиннер загрузки */
 .spinner {
     width: 40px;
     height: 40px;
-    margin: 0 auto 15px;
-    border: 4px solid var(--purple-light);
-    border-top-color: var(--purple-dark);
+    margin: 0 auto 20px;
+    border: 3px solid rgba(56, 189, 248, 0.2);
+    border-top-color: var(--accent);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -216,74 +247,67 @@ body {
     to { transform: rotate(360deg); }
 }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
+@keyframes slideUp {
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-/* --- Кнопка Наверх --- */
 .btn-up {
     position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 56px;
-    height: 56px;
+    bottom: 40px;
+    right: 40px;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
-    font-weight: 700;
-    color: #FFFFFF;
-    background: var(--purple);
+    color: var(--bg-main);
+    background: var(--accent);
     border: none;
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: 0 5px 20px rgba(167, 139, 250, 0.5);
+    box-shadow: 0 0 20px var(--accent-glow);
     transition: all var(--transition);
     z-index: 100;
 }
 
 .btn-up:hover {
-    background: var(--purple-dark);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(167, 139, 250, 0.7);
+    background: #7DD3FC;
+    box-shadow: 0 0 30px var(--accent);
+    transform: translateY(-5px);
 }
 
 .btn-up.hidden {
     opacity: 0;
     pointer-events: none;
-    transform: translateY(20px);
+    transform: translateY(30px);
 }
 
-/* --- Адаптив под телефоны --- */
-@media (max-width: 480px) {
+@media (max-width: 600px) {
     body {
         padding: 20px 15px;
     }
 
     .app-header h1 {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
     }
 
     .post-card {
-        padding: 20px 15px;
+        padding: 20px;
     }
 
     .post-title {
-        font-size: 1.05rem;
+        font-size: 1.15rem;
     }
 
     .btn-up {
         bottom: 20px;
         right: 20px;
-        width: 48px;
-        height: 48px;
+        width: 50px;
+        height: 50px;
         font-size: 1.2rem;
     }
 }
