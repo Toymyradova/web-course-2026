@@ -31,4 +31,3 @@
 
 **Как посмотреть на GitHub Pages:**
 https://toymyradova.github.io/web-course-2026/task8/
-*(Внимание: на GitHub Pages запросы к localhost:3001 не будут работать, так как там нет запущенного json-server. Проект предназначен для локального запуска).*
