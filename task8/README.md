@@ -29,5 +29,5 @@
 2. Запустить сервер в папке task8: `json-server --watch db.json --port 3001`
 3. Открыть `index.html` через Live Server.
 
-**Как посмотреть на GitHub Pages:**
+**Как запустить:**
 https://toymyradova.github.io/web-course-2026/task8/
