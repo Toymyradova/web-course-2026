@@ -1,17 +1,16 @@
 (function () {
     "use strict";
 
-    // Находим DOM-элементы
     const postsContainer = document.getElementById('posts');
     const loadingEl = document.getElementById('loading');
     const errorEl = document.getElementById('error');
     const emptyEl = document.getElementById('empty');
     const endEl = document.getElementById('end');
     const statsEl = document.getElementById('stats');
+    const progressEl = document.getElementById('progress-fill');
     const searchInput = document.getElementById('search');
     const btnUp = document.getElementById('btn-up');
 
-    // 1. Отрисовка постов
     function renderPosts(posts, query = '') {
         postsContainer.innerHTML = '';
 
@@ -25,9 +24,8 @@
 
         posts.forEach(post => {
             const card = document.createElement('article');
-            card.className = `post-card color-${post.userId % 5}`;
+            card.className = 'post-card';
 
-            // Шапка карточки (аватар, автор, id)
             const header = document.createElement('div');
             header.className = 'post-header';
 
@@ -49,12 +47,10 @@
             id.textContent = `#${post.id}`;
             header.append(author, id);
 
-            // Заголовок (с подсветкой поиска)
             const title = document.createElement('h2');
             title.className = 'post-title';
             highlightText(title, post.title, query);
 
-            // Текст
             const body = document.createElement('p');
             body.className = 'post-body';
             body.textContent = post.body;
@@ -64,7 +60,6 @@
         });
     }
 
-    // 2. Подсветка найденного текста в заголовке
     function highlightText(element, text, query) {
         if (!query) {
             element.textContent = text;
@@ -83,11 +78,9 @@
 
         while (index !== -1) {
             element.appendChild(document.createTextNode(text.slice(lastIndex, index)));
-            
             const mark = document.createElement('mark');
             mark.textContent = text.slice(index, index + query.length);
             element.appendChild(mark);
-
             lastIndex = index + query.length;
             index = lowerText.indexOf(lowerQuery, lastIndex);
         }
@@ -97,7 +90,6 @@
         }
     }
 
-    // 3. Управление состояниями (загрузка, ошибки, конец)
     function setLoading(isLoading) {
         if (isLoading) loadingEl.classList.remove('hidden');
         else loadingEl.classList.add('hidden');
@@ -116,7 +108,11 @@
     function hideEnd() { endEl.classList.add('hidden'); }
 
     function updateStats(loaded, total) {
-        statsEl.textContent = `Загружено: ${loaded} из ${total}`;
+        statsEl.textContent = `Загружено ${loaded} из ${total}`;
+        if (progressEl) {
+            const percent = Math.min((loaded / total) * 100, 100);
+            progressEl.style.width = percent + '%';
+        }
     }
 
     function setBtnUpVisible(visible) {
@@ -124,7 +120,6 @@
         else btnUp.classList.add('hidden');
     }
 
-    // 4. Экспорт
     window.PostsView = {
         renderPosts,
         setLoading,

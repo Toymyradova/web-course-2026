@@ -27,7 +27,6 @@
             : model.getPosts();
 
         view.renderPosts(postsToRender, currentQuery);
-        
         view.updateStats(model.getTotalLoaded(), model.getTotalPosts());
 
         if (!model.getHasMore() && !currentQuery) {
@@ -52,7 +51,7 @@
             } else if (!model.getHasMore()) {
                 view.showEnd();
             }
-        }, 300); 
+        }, 300);
     }
 
     function handleScroll() {
@@ -77,7 +76,6 @@
         const view = window.PostsView;
 
         view.searchInput.addEventListener('input', (e) => handleSearch(e.target.value));
-
         window.addEventListener('scroll', handleScroll);
 
         view.btnUp.addEventListener('click', () => {

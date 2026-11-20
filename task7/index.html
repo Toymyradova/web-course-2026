@@ -3,39 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Пастельная лента</title>
+    <title>Мир Постов</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="app">
         <header class="app-header">
-            <h1>Пастельная лента</h1>
-            <p class="subtitle">Посты из космоса (jsonplaceholder)</p>
+            <h1>Мир Постов</h1>
+            <p class="subtitle">Открой для себя что-то новое</p>
             
             <div class="search-wrapper">
-                <input type="search" id="search" class="search-input" placeholder="Поиск по заголовку..." autocomplete="off">
+                <span class="search-icon">🔍</span>
+                <input type="search" id="search" class="search-input" placeholder="Найти пост по названию..." autocomplete="off">
             </div>
         </header>
 
-        <div class="stats" id="stats"></div>
+        <div class="stats-container">
+            <div class="stats-text" id="stats">Загружено 0 из 100</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
 
         <main class="posts" id="posts"></main>
 
         <div class="state hidden" id="loading">
             <div class="spinner"></div>
-            <p>Загрузка…</p>
+            <p>Загрузка...</p>
         </div>
 
         <div class="state error hidden" id="error"></div>
-
-        <div class="state empty hidden" id="empty">
-            <p>Постов не найдено</p>
-        </div>
-
-        <div class="state end hidden" id="end">
-            <p>Больше постов нет</p>
-        </div>
+        <div class="state empty hidden" id="empty"><p>Ничего не найдено 😔</p></div>
+        <div class="state end hidden" id="end"><p>Вы просмотрели все посты! 🎉</p></div>
     </div>
 
     <button class="btn-up hidden" id="btn-up" title="Наверх">↑</button>
